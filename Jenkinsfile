@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout from Git') {
             steps {
-                git branch: 'main', url: 'https://github.com/Pardeep32/Uptime-kuma.git'
+                git branch: 'main', url: 'https://github.com/Sunilmargale/Uptime-kuma-CI-CD.git'
             }
         }
         stage('Install Dependencies') {
@@ -41,7 +41,7 @@ pipeline {
         }
         stage('OWASP Dependency Check') {
             steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DC'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
@@ -55,15 +55,15 @@ pipeline {
                 script {
                     withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
                         sh "docker build -t uptime ."
-                        sh "docker tag uptime pardeepkaur/uptime:latest"
-                        sh "docker push pardeepkaur/uptime:latest"
+                        sh "docker tag uptime sunilmargale/uptime:latest"
+                        sh "docker push sunilmargale/uptime:latest"
                     }
                 }
             }
         }
         stage('Trivy Image Scan') {
             steps {
-                sh "trivy image pardeepkaur/uptime:latest > trivy.json"
+                sh "trivy image sunilmargale/uptime:latest > trivy.json"
             }
         }
         stage('Remove Existing Container') {
@@ -74,7 +74,7 @@ pipeline {
         }
         stage('Deploy to Container') {
             steps {
-                sh 'docker run -d --name uptime -v /var/run/docker.sock:/var/run/docker.sock -p 3001:3001 pardeepkaur/uptime:latest'
+                sh 'docker run -d --name uptime -v /var/run/docker.sock:/var/run/docker.sock -p 3001:3001 sunilmargale/uptime:latest'
             }
         }
     }
